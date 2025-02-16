@@ -18,8 +18,8 @@ interface RepoState {
   ownerProfileUrl: string; // Посилання на профіль власника
   repoUrlLink: string;
 }
-
-const initialState: RepoState = {
+const savedState = localStorage.getItem("kanbanState");
+const initialState: RepoState = savedState ? JSON.parse(savedState) :{
   issues: [],
   repoUrl: "",
   columnOrder: {
@@ -30,6 +30,13 @@ const initialState: RepoState = {
   ownerProfileUrl: "",
   repoUrlLink: "",
 };
+
+const initialIssues = [
+  { id: "1", title: "Тестова задача 1", state: "open", assignee: null },
+  { id: "2", title: "Тестова задача 2", state: "open", assignee: "user1" },
+  { id: "3", title: "Тестова задача 3", state: "closed", assignee: "user2" },
+  { id: "4", title: "Тестова задача 4", state: "open", assignee: null },
+];
 
 const repoSlice = createSlice({
   name: "repo",
@@ -42,7 +49,7 @@ const repoSlice = createSlice({
       state.ownerProfileUrl = `https://github.com/${owner}`;
     },
     setIssues(state, action: PayloadAction<Issue[]>) {
-      state.issues = action.payload;
+      state.issues = action.payload || initialIssues;
       // Заповнення колонок за статусами
       state.columnOrder.todo = action.payload
         .filter((issue) => issue.state === "open" && !issue.assignee)
@@ -54,17 +61,19 @@ const repoSlice = createSlice({
         .filter((issue) => issue.state === "closed")
         .map((issue) => issue.id);
     },
-    moveIssue(state, action: PayloadAction<{ id: string; to: "todo" | "inProgress" | "done" }>) {
-      const { id, to } = action.payload;
+    moveIssue(state, action: PayloadAction<{ id: string; from: "todo" | "inProgress" | "done"; to: "todo" | "inProgress" | "done"; newIndex: number }>) {
+      const {  id, to  } = action.payload;
       // Переміщуємо issue між колонками
       for (const column in state.columnOrder) {
         const index = state.columnOrder[column as keyof typeof state.columnOrder].indexOf(id);
         if (index !== -1) {
           state.columnOrder[column as keyof typeof state.columnOrder].splice(index, 1);
+          break; // Виходимо з циклу, як тільки знайшли і видалили задачу
         }
       }
+    
       state.columnOrder[to].push(id);
-      
+    
       localStorage.setItem("kanbanState", JSON.stringify(state));
     },
   },

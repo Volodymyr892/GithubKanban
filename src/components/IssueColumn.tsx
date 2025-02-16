@@ -8,7 +8,12 @@ interface Issue {
 interface IssueColumnProps {
     column: "todo" | "inProgress" | "done";
     issues?: Issue[];
-    onMoveIssue: (issueid: string, to: "todo" | "inProgress" | "done")=>void;
+    onMoveIssue: (
+      issueId: string,
+      from: "todo" | "inProgress" | "done",
+      to: "todo" | "inProgress" | "done",
+      newIndex?: number
+    ) => void;
 } 
 
 const IssueColumn: React.FC<IssueColumnProps> = ({ 
@@ -41,7 +46,9 @@ const IssueColumn: React.FC<IssueColumnProps> = ({
                   }}
                 >
                   <p>{issue.title}</p>
-                  <button onClick={() => onMoveIssue(issue.id, "done")}>Move to Done</button>
+                  <button onClick={() => onMoveIssue(issue.id,  column, "done")}>
+                    {column === "done" ? "Already Done" : "Move to Done"}
+                  </button>
                 </div>
               )}
             </Draggable>
