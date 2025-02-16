@@ -4,7 +4,12 @@ import { setIssues } from "../redux/repoSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
-
+interface Issue {
+  id: string;
+  title: string;
+  state: "open" | "closed";
+  assignee: string | null;
+}
 interface RepoUrlInputProps {
     setRepoUrl: (url: string) => void;
   }
@@ -34,7 +39,7 @@ export const RepoUrlInput: React.FC<RepoUrlInputProps> = ({setRepoUrl})=>{
         // } catch (error) {
         //   console.error("Помилка при отриманні задач:", error);
         // }
-        const issues = [
+        const issues: Issue[] = [
           { id: "1", title: "Тестова задача 1", state: "open", assignee: null },
           { id: "2", title: "Тестова задача 2", state: "open", assignee: "user1" },
           { id: "3", title: "Тестова задача 3", state: "closed", assignee: "user2" },
@@ -45,7 +50,7 @@ export const RepoUrlInput: React.FC<RepoUrlInputProps> = ({setRepoUrl})=>{
     }
 
     return(
-        <div>
+        <div>ommit 
             <form onSubmit={handleSubmit}>
                 <input 
                 type="text"
